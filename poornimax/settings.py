@@ -120,6 +120,34 @@ CHANNEL_LAYERS = {
     },
 }
 
+# Render.com specific settings
+import os
+if os.environ.get('RENDER'):
+    # Render.com environment
+    ALLOWED_HOSTS = ['*']
+    DEBUG = False
+    
+    # Database configuration for Render
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+    
+    # Redis configuration for Render
+    REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [REDIS_URL],
+            },
+        },
+    }
+
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
